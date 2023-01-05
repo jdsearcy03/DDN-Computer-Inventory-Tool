@@ -26,8 +26,6 @@ function changeLocation(e) {
 
 //Show/Hide List
 function changeListDisplay(e) {
-    let listClasses = serialList.classList;
-    console.log(serialList.classList);
     if (serialList.classList[1] == 'd-none') {
         serialList.classList.remove('d-none');
         e.target.innerText = 'Cancel';
