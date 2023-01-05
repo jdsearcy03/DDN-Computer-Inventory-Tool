@@ -5,6 +5,9 @@ let locationID = '';
 const apiToken = document.querySelector('#apiToken');
 const serialNumberEntry = document.querySelector('#serialNumber');
 const submit = document.querySelector('#submit');
+const list = document.querySelector('#listButton');
+const serialList = document.querySelector('#serialList');
+const listItem = document.querySelector('#inputList');
 const successList = document.querySelector('#successGroup');
 const failList = document.querySelector('#failGroup');
 let listGroup = '';
@@ -13,6 +16,7 @@ let errorCatch = false;
 //Set Event Listeners
 locationOptions.addEventListener("change", changeLocation);
 submit.addEventListener("click", submitRequest);
+list.addEventListener("click", changeListDisplay);
 
 //Change selectedLocation on selection
 function changeLocation(e) {
@@ -20,17 +24,46 @@ function changeLocation(e) {
     locationID = document.querySelector(`option[value="${selectedLocation}"`).id;
 };
 
+//Show/Hide List
+function changeListDisplay(e) {
+    let listClasses = serialList.classList;
+    console.log(serialList.classList);
+    if (serialList.classList[1] == 'd-none') {
+        serialList.classList.remove('d-none');
+        e.target.innerText = 'Cancel';
+        e.target.classList.remove('btn-secondary');
+        e.target.classList.add('btn-danger');
+    } else {
+        serialList.classList.add('d-none');
+        e.target.innerText = 'Input List';
+        e.target.classList.remove('btn-danger');
+        e.target.classList.add('btn-secondary');
+    }
+};
+
 //Submit Form
-async function submitRequest(e) {
+function submitRequest(e) {
     e.preventDefault();
     errorCatch = false;
     let token = apiToken.value;
-    let checkSerial = serialNumberEntry.value.substring(serialNumberEntry.value.length - 8).toUpperCase();
-    let serialNumber = '';
+    let listSerials = [];
+    if (inputList.value != '') {
+        listSerials = inputList.value.split(/\n/);
+        list.click();
+        listSerials.forEach(serialNumber => {
+            processRequest(token, serialNumber);
+        });
+        inputList.value = '';
+    } else {
+        let serialNumber = serialNumberEntry.value;
+        processRequest(token, serialNumber);
+    }
+};
+
+async function processRequest(token, serialNumber) {
+    let checkSerial = serialNumber.substring(serialNumberEntry.value.length - 8).toUpperCase();
     if (checkSerial[0] === 'M' || checkSerial[0] === 'P' || checkSerial[0] === 'R') {
         serialNumber = checkSerial;
-    } else {
-        serialNumber = `${serialNumberEntry.value}`;
     }
     if (selectedLocation === 'Choose...' || serialNumber === '' || apiToken === '') {
         alert('Please complete the form');
